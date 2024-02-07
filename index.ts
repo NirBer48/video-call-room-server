@@ -9,7 +9,7 @@ const app: Application = express();
 
 app.use(
     cors({
-        origin: "http://10.100.11.131:8080",
+        origin: "http://localhost:8080",
         credentials: true,
     })
 );
@@ -32,6 +32,6 @@ io.on("connection", (socket) => {
     })
 });
 
-httpServer.listen(PORT, "10.100.11.131" || "localhost", () => {
+httpServer.listen(PORT, () => {
     console.log("server listening on port 4000")
 });
