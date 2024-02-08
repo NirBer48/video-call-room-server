@@ -9,7 +9,7 @@ const app: Application = express();
 
 app.use(
     cors({
-        origin: "http://localhost",
+        origin: "https://nir.team-pandora.com/socket",
         credentials: true,
     })
 );
@@ -20,6 +20,7 @@ const io = new Server(httpServer, {
         origin: "*",
         methods: ["GET", "POST"],
     },
+    path: "/socket",
 });
 
 io.on("connection", (socket) => {
