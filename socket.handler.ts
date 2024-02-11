@@ -35,8 +35,10 @@ export const handler = (socket: Socket) => {
     };
 
     const leaveRoom = ({peerId, roomId}: IRoomParams) => {
-        rooms[roomId] = rooms[roomId].filter((id) => id !== peerId);
-        socket.to(roomId).emit("user-disconneted", peerId);
+        if (rooms[roomId]) {
+            rooms[roomId] = rooms[roomId].filter((id) => id !== peerId);
+            socket.to(roomId).emit("user-disconneted", peerId);
+        }
     }
 
     const getRooms = () => {
