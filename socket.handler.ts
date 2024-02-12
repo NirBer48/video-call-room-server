@@ -1,11 +1,12 @@
 import { Socket } from "socket.io";
 import { v4 as uuvidV4 } from "uuid";
 
-const rooms: Record<string, string[]> = {};
+const rooms: Record<string, [string, string][]> = {};
 
 interface IRoomParams {
     roomId: string;
     peerId: string;
+    peerName: string;
 };
 
 export const handler = (socket: Socket) => {
@@ -16,12 +17,12 @@ export const handler = (socket: Socket) => {
         console.log("user created a room");
     };
     
-    const joinRoom = ({ roomId, peerId } : IRoomParams) => {
-        if (rooms[roomId] && !rooms[roomId].includes(peerId)) {
+    const joinRoom = ({ roomId, peerId, peerName } : IRoomParams) => {
+        if (rooms[roomId] && !rooms[roomId].map(room => room[0]).includes(peerId)) {
             socket.join(roomId);
-            rooms[roomId].push(peerId);
-            console.log("user joined room: " + roomId);
-            socket.to(roomId).emit("user-joined", {peerId});
+            rooms[roomId].push([peerId, peerName]);
+            console.log(peerName + " joined room: " + roomId);
+            socket.to(roomId).emit("user-joined", {peerId, peerName});
             socket.emit("get-users", {
                 roomId,
                 participants: rooms[roomId],
@@ -34,9 +35,9 @@ export const handler = (socket: Socket) => {
         })
     };
 
-    const leaveRoom = ({peerId, roomId}: IRoomParams) => {
+    const leaveRoom = ({peerId, roomId}: Omit<IRoomParams, "peerName">) => {
         if (rooms[roomId]) {
-            rooms[roomId] = rooms[roomId].filter((id) => id !== peerId);
+            rooms[roomId] = rooms[roomId].filter((peer) => peer[0] !== peerId);
             socket.to(roomId).emit("user-disconneted", peerId);
         }
     }
